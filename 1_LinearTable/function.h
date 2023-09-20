@@ -39,3 +39,9 @@ Status CreateLinkListByHead(LinkList* L, int numElem);
 Status CreateLinkListByTail(LinkList* L, int numElem);
 
 Status ClearLinkList(LinkList* L);
+
+//静态链表
+typedef struct{
+  ElemType data;
+  int cursor;
+}Component, StaticLinkList[MAXSIZE];

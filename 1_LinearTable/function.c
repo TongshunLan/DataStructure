@@ -94,7 +94,7 @@ Status InsertElem_LinkList(LinkList* L, int location_LinkList, ElemType e) {
   }
   // j == location_LinkList，但p慢了j一步，它指向location_LinkList-1
   Node* s = (Node*)malloc(sizeof(Node));
-  if(NULL == s){
+  if (NULL == s) {
     return ERROR;
   }
   s->data = e;
@@ -126,7 +126,7 @@ Status DeleteElem_LinkList(LinkList* L, int location_LinkList, ElemType* e) {
 Status CreateLinkListByHead(LinkList* L, int numElem) {
   // 头结点建立
   *L = (Node*)malloc(sizeof(Node));
-  if(NULL == (*L)){
+  if (NULL == (*L)) {
     return ERROR;
   }
   (*L)->next = NULL;
@@ -136,7 +136,7 @@ Status CreateLinkListByHead(LinkList* L, int numElem) {
   int i = 0;
   for (i = 0; i < numElem; i++) {
     p = (Node*)malloc(sizeof(Node));
-    if(NULL == p){
+    if (NULL == p) {
       return ERROR;
     }
     p->data = rand() % 100 + 1;
@@ -147,40 +147,125 @@ Status CreateLinkListByHead(LinkList* L, int numElem) {
   return OK;
 }
 
-//尾插法建立单链表
-Status CreateLinkListByTail(LinkList* L, int numElem){
-  //头结点建立
+// 尾插法建立单链表
+Status CreateLinkListByTail(LinkList* L, int numElem) {
+  // 头结点建立
   (*L) = (Node*)malloc(sizeof(Node));
-  if((*L) == NULL){
+  if ((*L) == NULL) {
     return ERROR;
   }
   Node* r = (*L);
-  //存储随机数
+  // 存储随机数
   srand(time(NULL));
-  int i =0;
+  int i = 0;
   Node* p = NULL;
-  for(i = 0; i < numElem; i++){
+  for (i = 0; i < numElem; i++) {
     p = (Node*)malloc(sizeof(Node));
-    if(NULL == p){
+    if (NULL == p) {
       return ERROR;
     }
-    p->data = rand()%100+1;
+    p->data = rand() % 100 + 1;
     r->next = p;
     r = p;
   }
-  r->next = NULL;//表尾置空
+  r->next = NULL;  // 表尾置空
   return OK;
 }
 
-//单链表的整表删除
-Status ClearLinkList(LinkList* L){
-  Node* p = (*L)->next;//p指向第一个结点
+// 单链表的整表删除
+Status ClearLinkList(LinkList* L) {
+  Node* p = (*L)->next;  // p指向第一个结点
   Node* q = NULL;
-  while(p != NULL){
+  while (p != NULL) {
     q = p->next;
     free(p);
     p = q;
   }
   (*L)->next = NULL;
   return OK;
+}
+
+// 静态链表初始化
+Status InitStaticLinkList(StaticLinkList space) {
+  int i = 0;
+  for (i = 0; i < MAXSIZE - 1; i++) {
+    space[i].cursor = i + 1;
+    space[i].data = 0;
+  }
+  // 最后一个元素特殊当头结点处理，第一个元素不存data，它告知第一个拥有空闲位置结点的下标
+  space[MAXSIZE - 1].cursor = 0;
+  return OK;
+}
+
+// 静态链表的插入操作
+// 先实现自制的Malloc_SLL
+int Malloc_SLL(StaticLinkList space) {
+  int emptyIndex = space[0].cursor;
+  // 如果下一个空闲位置真的存在，那么它的下标也存在
+  if (space[0].cursor) {
+    space[0].cursor = space[emptyIndex].cursor;  // 存储下一个空闲位置的下标
+  }
+  return emptyIndex;  // 返回第一个空闲位置的结点下标
+}
+
+int Length_StaticLinkList(StaticLinkList L) {
+  int length = 0;
+  int index = L[MAXSIZE-1].cursor;
+  while(index){
+    index = L[index].cursor;
+    length++;
+  }
+  return length;
+}
+// 插入操作
+Status InsertElem_StaticLinkList(StaticLinkList L, int Location_StaticLinkList,
+                                 ElemType elem) {
+  // 插入位置越界
+  if (Location_StaticLinkList < 1 ||
+      Location_StaticLinkList > Length_StaticLinkList(L) + 1) {
+    return ERROR;
+  }
+  // 获取空闲位置的下标
+  int emptyIndex = Malloc_SLL(L);
+  // 判断下标是否有效
+  if (emptyIndex) {
+    //赋值
+    L[emptyIndex].data = elem;
+    //找到赋值元素的前继元素，从头结点入手
+    int nextElemIndex = MAXSIZE -1;
+    for(int i = 1 ; i < Location_StaticLinkList; i++){
+      nextElemIndex =  L[nextElemIndex].cursor;
+    }
+    //找到赋值元素的前继元素后，将它后继元素信息，告诉新元素（类似p->next）
+    L[emptyIndex].cursor  = L[nextElemIndex].cursor;
+    L[nextElemIndex].cursor = emptyIndex;
+    return OK;
+  } else {
+    return ERROR;
+  }
+}
+
+//静态链表的删除操作
+//先实现自制的Free_SSL
+void Free_SSL(StaticLinkList space, int Location_StaticLinkList){
+  //告诉删除位置的下标，它要指向一个空闲的位置
+  space[Location_StaticLinkList].cursor =  space[0].cursor;
+  //告诉当前指向空闲位置的下标，它要指向一个新鲜的空闲位置
+  space[0].cursor = Location_StaticLinkList;
+}
+//删除第i个元素
+Status DeleteElem_StaticLinkList(StaticLinkList L, int Location_StaticLinkList){
+  //越界删除
+  if(Location_StaticLinkList < 1 || Location_StaticLinkList > Length_StaticLinkList(L)){
+    return ERROR;
+  }
+  //找到Location_StaticLinkList-1的元素
+  int nextElemIndex = MAXSIZE-1;
+  for(int j = 1; j < Location_StaticLinkList; j++){
+    nextElemIndex =  L[nextElemIndex].cursor;
+  }
+  //使用临时q记录要删除的元素的位置，并改变Location_StaticLinkList-1指向
+  int q = L[nextElemIndex].cursor;
+  L[nextElemIndex].cursor = L[q].cursor;
+  Free_SSL(L,q);
 }
