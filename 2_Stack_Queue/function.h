@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 //栈的顺序存储结构及实现
 typedef int Status;
 #define OK 1
@@ -43,3 +44,40 @@ typedef struct LinkStack{
     LinkStackPtr top;
     int count;
 }LinkStack;
+
+//循环队列的顺序存储结构
+typedef int QElemType;
+typedef struct SqQueue{
+    QElemType data[MAXSIZE];
+    int front;
+    int rear;
+}SqQueue;
+
+//SqQueue初始化
+Status InitSqQueue(SqQueue* Q);
+
+//求SqQueue长度
+int Length_SqQueue(SqQueue Q);
+
+//SqQueue队尾入队
+Status Enter_SqQueue(SqQueue* Q, QElemType e);
+
+//SqQueue队头出队
+Status Delete_SqQueue(SqQueue* Q, QElemType* e);
+
+//链队的结构
+typedef struct NodeOfLinkQueue{
+    QElemType data;
+    struct NodeOfQueue* next;
+}NodeOfLinkQueue,*LinkQueuePtr;
+
+typedef struct LinkQueue{
+    LinkQueuePtr front;
+    LinkQueuePtr rear;
+}LinkQueue;
+
+//LinkQueue队尾入队
+Status Enter_LinkQueue(LinkQueue* Q, QElemType e);
+
+//LinkQueue队头出队
+Status Delete_LinkQueue(LinkQueue* Q, QElemType* e);
