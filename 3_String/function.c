@@ -94,3 +94,51 @@ int IndexStringByArray(SqString fatherString, SqString childString){
         return FALSE;
     }
 }
+
+//KMP算法-主串不回溯（i不吃回头草）
+//求next数组
+void get_next(SqString childString, int* next){
+  next[0] = -1;
+  next[1] = 0;
+  int i = 1;
+  int j = 0;
+  while(i < childString.length){
+    if(0 == j || childString.string[i-1] == childString.string[j-1]){
+      i++;
+      j++;
+      next[i] = j;//next[2] = 1
+    }
+    else{
+      j = next[j];//字符不同，j回溯
+    }
+  }
+}
+//利用next数组
+int Index_KMP(SqString fatherString, SqString childString, int next[]){
+  int i = 1;
+  int j = 1;
+  while(i <= fatherString.length && j <= childString.length){
+    //相等情况
+    if(fatherString.string[i-1] == childString.string[j-1]){
+      i++;
+      j++;
+    }
+    //不相等，i不回头，j回溯
+    else{
+      j = next[j];
+      if(0 == j){
+        i++;
+        j++;
+      }
+    }
+  }
+  if(j > childString.length){
+    return i - childString.length;
+  }
+  else{
+    return FALSE;
+  }
+}
+
+
+//KMP算法优化

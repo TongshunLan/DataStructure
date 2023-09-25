@@ -31,3 +31,10 @@ int IndexStringByFunction(SqString fatherString, SqString childString);
 
 // 方法二：朴素模式匹配算法（使用数组实现）
 int IndexStringByArray(SqString fatherString, SqString childString);
+
+//KMP算法-主串不回溯（i不吃回头草）
+//求next数组
+void get_next(SqString childString, int* next);
+
+//利用next数组
+int Index_KMP(SqString fatherString, SqString childString, int next[]);
