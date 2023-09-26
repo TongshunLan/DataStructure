@@ -36,5 +36,8 @@ int IndexStringByArray(SqString fatherString, SqString childString);
 //求next数组
 void get_next(SqString childString, int* next);
 
-//利用next数组
-int Index_KMP(SqString fatherString, SqString childString, int next[]);
+//利用next/nextval数组(用最新的nextval)
+int Index_KMP(SqString fatherString, SqString childString);
+
+//求nextval数组
+void get_nextval(SqString childString, int* next);

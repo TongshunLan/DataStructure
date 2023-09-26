@@ -100,9 +100,11 @@ int IndexStringByArray(SqString fatherString, SqString childString){
 void get_next(SqString childString, int* next){
   next[0] = -1;
   next[1] = 0;
-  int i = 1;
+  int i = 1;//i不回头
   int j = 0;
   while(i < childString.length){
+    //childString.string[i-1]后缀前部位单个字符
+    //childString.string[j-1]前缀前部位单个字符
     if(0 == j || childString.string[i-1] == childString.string[j-1]){
       i++;
       j++;
@@ -113,23 +115,23 @@ void get_next(SqString childString, int* next){
     }
   }
 }
-//利用next数组
-int Index_KMP(SqString fatherString, SqString childString, int next[]){
+//利用next/nextval数组
+int Index_KMP(SqString fatherString, SqString childString){
+  //定义nextval数组（用最新的）
+  int nextval[255];
+  //对孩子串进行分析
+  get_nextval(childString, nextval);
   int i = 1;
   int j = 1;
   while(i <= fatherString.length && j <= childString.length){
     //相等情况
-    if(fatherString.string[i-1] == childString.string[j-1]){
+    if(0 == j || fatherString.string[i-1] == childString.string[j-1]){
       i++;
       j++;
     }
     //不相等，i不回头，j回溯
     else{
-      j = next[j];
-      if(0 == j){
-        i++;
-        j++;
-      }
+      j = nextval[j];//有可能致使j==0
     }
   }
   if(j > childString.length){
@@ -141,4 +143,28 @@ int Index_KMP(SqString fatherString, SqString childString, int next[]){
 }
 
 
-//KMP算法优化
+//KMP算法优化(实质是优化next数组成nextval数组)
+//求nextval数组
+void get_nextval(SqString childString, int* nextval){
+  nextval[0] = -1;
+  nextval[1] = 0;
+  int i = 1;//i不回头
+  int j = 0;
+  while(i < childString.length){
+    //childString.string[i-1]后缀前部位单个字符
+    //childString.string[j-1]前缀前部位单个字符
+    if(0 == j || childString.string[i-1] == childString.string[j-1]){
+      i++;
+      j++;
+      nextval[i] = j;//next[2] = 1
+      //此处优化开始
+      if(childString.string[i-1] == childString.string[nextval[i]-1]){
+        //更正nextval[i]
+        nextval[i] = nextval[nextval[i]];
+      }
+    }
+    else{
+      j = nextval[j];//字符不同，j回溯
+    }
+  }
+}
