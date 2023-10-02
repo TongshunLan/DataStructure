@@ -1,8 +1,13 @@
 #include <stdio.h>
+#include <stdlib.h>
+typedef int Status;
+#define ERROR 0
+#define OK 1
+
 // 树（初阶）
 // 双亲表示法————————————
 #define MAXSIZE_TREE 100
-typedef int ElemType_Tree;
+typedef char ElemType_Tree;
 
 // 创建双亲结点
 typedef struct Node_ParentTree {
@@ -65,3 +70,20 @@ void InOrderTraverse(BinaryTree binaryTree);
 void PostOrderTraverse(BinaryTree binaryTree);
 
 // 层序遍历（从根那层开始，从左至右）
+
+//二叉树的建立
+Status CreateBinaryTree(BinaryTree* T);
+
+//线索化二叉树(实质上是遇到空指针时，将其改为指向前驱或后继的线索)
+typedef enum PointerTag{
+  Link,//0表孩子
+  Thread//1表线索
+}PointerTag;
+
+//线索二叉树结构
+typedef struct Node_ThreadBinaryTree{
+  ElemType_Tree data;
+  struct Node_ThreadBinaryTree* leftChild,*rightChild;
+  PointerTag leftTag;
+  PointerTag rightTag;
+}Node_BinaryTree,*ThreadBinaryTree;
